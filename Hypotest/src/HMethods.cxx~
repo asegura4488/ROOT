@@ -1,0 +1,532 @@
+#include "../include/HMethods.h"
+
+HMethods::HMethods(): ConFolder(""){
+
+}
+
+void HMethods::SetConfig(string path){
+ConFolder=path;
+}
+
+void HMethods::Init(string path){
+
+  Input[0].open(ConFolder+"/"+path+".in");
+  if(!Input[0]) {
+    std::cout << "could not open file:" << ConFolder << " " << path+".in" << std::endl;
+    exit(1);
+  } 
+
+   string files_=""; 
+   while(!Input[0].eof()){
+   Input[0] >> files_;
+   Work_F.push_back(files_);
+   }
+   Work_F.pop_back();
+   Input[0].close();
+
+}
+
+void HMethods::InitXsec(string path){
+
+  Input[1].open(ConFolder+"/"+path+".in");
+  if(!Input[1]) {
+    std::cout << "could not open file:" << ConFolder << " " << path+".in" << std::endl;
+    exit(1);
+  } 
+
+   Double_t Chimass_=0.; 
+   Double_t Xsec_=0.;
+   Double_t EXsec_=0.;
+   while(!Input[1].eof()){
+   Input[1] >> Chimass_;
+   Input[1] >> Xsec_;
+   Input[1] >> EXsec_;
+   Chargino_mass.push_back(Chimass_);
+   Theoretical_xsec.push_back(Xsec_);
+   ETheoretical_xsec.push_back(EXsec_);
+   }
+
+   Chargino_mass.pop_back();
+   Theoretical_xsec.pop_back();
+   ETheoretical_xsec.pop_back();
+   
+   Input[1].close();
+}
+
+void HMethods::Show(){
+  for(UInt_t i = 0; i < Work_F.size(); i++){
+    cout << " Workspace for: " << Work_F[i] << endl;
+  }
+}
+
+void HMethods::InitWorkspaces(string name_){
+
+  for(UInt_t i = 0; i < Work_F.size(); i++){
+    File_[i] = TFile::Open(("workspaces/"+Work_F[i]+".root").c_str());
+    if(!File_[i]){
+	 std::cout << " File no found: " << Work_F[i] << std::endl;
+	 exit(1);
+	 } 
+    else{
+    W_[i] = (RooWorkspace*) File_[i]->Get(name_.c_str());
+    if(!W_[i]){ 
+	std::cout << " Workspace no found: " << Work_F[i] << std::endl;
+	exit(1);  
+	}
+    //W_[i]->Print(); Non-necessary
+    }
+  }
+
+}
+
+void HMethods::CreateModels(string data_, string alternative_){
+ 
+  for(UInt_t i = 0; i < Work_F.size(); i++){
+    std::cout << " Creating model for: " << Work_F[i] << std::endl;
+    //Data 
+    data[i] = W_[i]->data(data_.c_str());
+    if(!data[i]){ std::cout << " Dataset no found: " << std::endl; 
+       exit(1);
+    }
+    //Signal
+    sbModel[i] = (RooStats::ModelConfig*) W_[i]->obj(alternative_.c_str());
+    if(!sbModel[i]){ std::cout << " Signal Model no found: " << std::endl; 
+       exit(1);
+    }
+    Pois[i] = dynamic_cast<RooRealVar*>(sbModel[i]->GetParametersOfInterest()->first());
+    sbModel[i]->SetSnapshot(*Pois[i]);
+    //Background
+    bModel[i] = (RooStats::ModelConfig*) sbModel[i]->Clone("BonlyModel");
+    Poib[i] = dynamic_cast<RooRealVar*>(bModel[i]->GetParametersOfInterest()->first());
+    Poib[i]->setVal(0.); // For null hypothesis
+    bModel[i]->SetSnapshot(*Poib[i]);
+  }
+   
+}
+
+///Methods
+
+Double_t HMethods::GetLikelihood(Int_t index){
+
+  Double_t Significance = 0.;
+  MCpdf = bModel[index]->GetPdf();
+  RooAbsReal *nll = MCpdf->createNLL(*data[index], RooFit::NumCPU(8));
+
+  RooPlot *frame_ = W_[index]->var("SigXsecOverSM")->frame(); 
+  nll->plotOn(frame_, RooFit::ShiftToZero());
+  
+
+  Minimizer = new RooMinimizer(*nll);
+  Minimizer->minimize("Minuit2", "midgrad");
+  Minimizer->hesse();
+
+  result_like = Minimizer->save();
+  
+ 
+  //Save correlation matrix
+  TMatrixDSym cov = result_like->covarianceMatrix();
+
+  c1 = new TCanvas("c1","Likelihood",900,500);
+  c1->Divide(2,1);
+  c1->cd(1);
+  frame_->Draw();
+  c1->cd(2);
+  result_like->correlationHist()->Draw("colz");
+
+  return Significance;
+}
+
+Double_t HMethods::GetFrequentist(Int_t index){
+  
+  Double_t Significance = 0.;
+  freq = new RooStats::FrequentistCalculator(*data[index],*bModel[index],*sbModel[index]);
+  freq->SetToys(100,100); // NUll, Alter
+  ToyMC = (RooStats::ToyMCSampler*)freq->GetTestStatSampler();
+  profile = new RooStats::ProfileLikelihoodTestStat(*sbModel[index]->GetPdf());
+  profile->SetOneSided(true);
+  ToyMC->SetTestStatistic(profile);
+
+  Inverter = new RooStats::HypoTestInverter(*freq);
+  Inverter->SetConfidenceLevel(0.95);
+  Inverter->UseCLs(true);  
+  Inverter->SetVerbose(false);
+  Inverter->SetFixedScan(5,0.001,10.0); // Set number of points, xmin and xmax
+
+  Iresult = Inverter->GetInterval();
+  Significance = Iresult->UpperLimit();
+  //Significance = Iresult->GetExpectedUpperLimit(0);
+
+  Plot = new RooStats::HypoTestInverterPlot("Plot","HypoTest Scan Result",Iresult);
+  Plot->Draw("CLb 2CL");
+
+  return Significance;
+}
+
+Double_t HMethods::GetBayesian(Int_t index){
+
+  Double_t Significance = 0.;
+  
+  BayesCalc = new RooStats::BayesianCalculator(*data[index],*sbModel[index]);
+  BayesCalc->SetName("Bayesian");
+  BayesCalc->SetConfidenceLevel(0.95);
+  BayesCalc->SetLeftSideTailFraction(0.5);
+  BayesCalc->SetIntegrationType("ROOFIT");
+  
+
+  SimpleI = BayesCalc->GetInterval();
+
+  Significance = SimpleI->UpperLimit();
+  BayesCalc->SetScanOfPosterior(1);
+  RooPlot *plot = BayesCalc->GetPosteriorPlot();
+  plot->Draw();  
+
+  return Significance;
+
+}
+
+Double_t HMethods::GetProfile(Int_t index){
+
+  Double_t Significance = 0.;
+  plc = new RooStats::ProfileLikelihoodCalculator(*data[index], *sbModel[index]);
+  plc->SetConfidenceLevel(0.95);
+  plc->SetAlternateParameters(*sbModel[index]->GetSnapshot());
+  plc->SetNullParameters(*bModel[index]->GetSnapshot());
+  Sigma = W_[index]->var("SigXsecOverSM");
+
+  //Get Limit
+  //result = plc->GetHypoTest();
+  interval_ = plc->GetInterval();
+  //Significance = result->Significance();
+  //Significance = result->CLsplusb();
+ // Significance = result->CLs();
+  //Significance = result->NullPValue();
+  //Significance = result->AlternatePValue();
+
+  Significance = interval_->UpperLimit(*Sigma);
+ // Significance = interval_->LowerLimit(*Sigma);
+  return Significance;
+
+}
+
+Double_t HMethods::GetAsymtotic(Int_t index){
+
+  Double_t Significance = 0.; 
+  AsymCalc = new RooStats::AsymptoticCalculator(*data[index], *sbModel[index], *bModel[index]);
+  AsymCalc->SetOneSided(false);
+   
+  result = AsymCalc->GetHypoTest(); 
+  // Significance = result->Significance();
+  // Significance = result->CLs();
+
+  Inverter = new RooStats::HypoTestInverter(*AsymCalc);
+  Inverter->SetConfidenceLevel(0.95);
+  Inverter->UseCLs(true);  
+  Inverter->SetVerbose(false);
+  Inverter->SetFixedScan(30,0.01,30.0); // Set number of points, xmin and xmax
+  
+  Iresult = Inverter->GetInterval();
+  //Significance = Iresult->UpperLimit();
+ 
+  Significance = Iresult->GetExpectedUpperLimit(0);
+
+  UpperVector.push_back(Iresult->GetExpectedUpperLimit(-2));
+  UpperVector.push_back(Iresult->GetExpectedUpperLimit(-1));
+  UpperVector.push_back(Iresult->GetExpectedUpperLimit(0));
+  UpperVector.push_back(Iresult->GetExpectedUpperLimit(1));
+  UpperVector.push_back(Iresult->GetExpectedUpperLimit(2));
+ 
+  ShowUpperVector();
+
+  Plot = new RooStats::HypoTestInverterPlot("Plot","HypoTest Scan Result",Iresult);
+  Plot->Draw("CLb 2CL");
+
+
+  return Significance;
+  
+}
+
+Double_t HMethods::GetHybrid(Int_t index){
+
+  Double_t Significance = 0.; 
+  hc = new RooStats::HybridCalculator(*data[index], *sbModel[index], *bModel[index]);
+  ToyMC = (RooStats::ToyMCSampler*)hc->GetTestStatSampler();
+  ToyMC->SetNEventsPerToy(1); // because the model is in number counting form
+  //ToyMC->SetTestStatistic(&binCount);
+
+  hc->SetToys(50,50);
+  //Nuisance
+  //hc->ForcePriorNuisanceAlt(*W_[index]->pdf("Algoooo"));
+  //hc->ForcePriorNuisanceNull(*W_[index]->pdf("Algoooo"));
+
+  //Get Limit
+  result = hc->GetHypoTest();
+  Significance = result->CLs();
+  //Significance = result->Significance();
+
+  Inverter = new RooStats::HypoTestInverter(*hc);
+  Inverter->SetConfidenceLevel(0.95);
+  Inverter->UseCLs(true);  
+  Inverter->SetVerbose(false);
+  Inverter->SetFixedScan(10,1.0,10.0); // Set number of points, xmin and xmax
+  
+  Iresult = Inverter->GetInterval();
+  Significance = Iresult->UpperLimit();
+
+  UpperVector.push_back(Iresult->GetExpectedUpperLimit(-2));
+  UpperVector.push_back(Iresult->GetExpectedUpperLimit(-1));
+  UpperVector.push_back(Iresult->GetExpectedUpperLimit(0));
+  UpperVector.push_back(Iresult->GetExpectedUpperLimit(1));
+  UpperVector.push_back(Iresult->GetExpectedUpperLimit(2));
+ 
+  ShowUpperVector();
+
+  Plot = new RooStats::HypoTestInverterPlot("Plot","HypoTest Scan Result",Iresult);
+  Plot->Draw("CLb 2CL");
+
+  return Significance;
+
+}
+
+Double_t HMethods::GetMarkov(Int_t index, Double_t Confidence){
+
+  Double_t Upperlimit = 0.;
+
+  Mmc = new RooStats::MCMCCalculator(*data[index], *sbModel[index]);
+  Mmc->SetConfidenceLevel(Confidence);
+  Mmc->SetNumBins(1000);
+  Mmc->SetNumBurnInSteps(5);
+  Mmc->SetNumIters(50000);
+
+  Mmcint = Mmc->GetInterval();
+
+  Upperlimit = Mmcint->UpperLimit(*Poib[index]);
+  return Upperlimit;
+ // std::cout << Mmcint->UpperLimit(*Pois[index]) << std::endl;
+ // std::cout << Mmcint->UpperLimit(*Poib[index]) << std::endl;
+}
+
+
+void HMethods::GetHypoTest(Int_t value, string method){
+
+  if(value == -1){
+
+  for(UInt_t i = 0; i < Work_F.size(); i++){
+   HighErrorSignificance.push_back(0.1);
+   LowErrorSignificance.push_back(0.2);
+   HighErrorSignificance2.push_back(0.3);
+   LowErrorSignificance2.push_back(0.4);
+   
+   if(method == "like") SignificanceP.push_back(GetLikelihood(i));
+   else if(method == "frequentist") SignificanceP.push_back(GetFrequentist(i));
+   else if(method == "bayesian") SignificanceP.push_back(GetBayesian(i));
+   else if(method == "profile") SignificanceP.push_back(GetProfile(i));
+   else if (method == "asym") SignificanceP.push_back(GetAsymtotic(i));
+   else if (method == "Hybrid") SignificanceP.push_back(GetHybrid(i));
+   else if (method == "Markov") SignificanceP.push_back(GetMarkov(i,0.95));
+   else {
+       std::cout << " Method no available: " << std::endl;
+  	exit(1);  
+   }
+  }
+
+  }
+  else{
+   if(method == "like")  SignificanceP.push_back(GetLikelihood(value));
+   else if(method == "frequentist") SignificanceP.push_back(GetFrequentist(value));
+   else if(method == "bayesian") SignificanceP.push_back(GetBayesian(value));
+   else if(method == "profile")  SignificanceP.push_back(GetProfile(value));
+   else if (method == "asym") SignificanceP.push_back(GetAsymtotic(value));
+   else if (method == "Hybrid") SignificanceP.push_back(GetHybrid(value));
+   else if (method == "Markov") SignificanceP.push_back(GetMarkov(value,0.95));
+   else {
+      std::cout << " Method no available: " << std::endl;
+     exit(1);  
+   }
+   }
+  
+  ShowSignificance();
+
+}
+
+void HMethods::ShowSignificance(){
+
+  for(UInt_t i = 0; i < SignificanceP.size(); i++){
+   std::cout << SignificanceP[i] << " For " << Work_F[i] << std::endl;
+  }
+ 
+}
+
+void HMethods::ShowUpperVector(){
+  
+    string label="";
+    for(UInt_t i = 0; i < UpperVector.size(); i++){
+    if(i==0) label="Expected limit (-2 sigma) "; 
+    else if(i==1) label="Expected limit (-1 sigma) "; 
+    else if(i==2) label="Expected limit (Mean) "; 
+    else if(i==3) label="Expected limit (+1 sigma) ";
+    else if(i==4) label="Expected limit (+2 sigma) ";  
+    std::cout << label << UpperVector[i] << std::endl;
+    } 
+}
+
+void HMethods::FillVectors(){
+
+ Int_t Npoints = Chargino_mass.size();
+ X = new Double_t[Npoints];
+ Y = new Double_t[Npoints];
+ EX = new Double_t[Npoints];
+ EY = new Double_t[Npoints];
+ /////
+  int i=0;
+  for(auto& it : Chargino_mass){
+      X[i] = it;
+      EX[i] = 0.;
+      i++;
+  } 
+  i=0;
+  for(auto& it : Theoretical_xsec){
+      Y[i] = it;
+      i++;
+  } 
+  i=0;
+  for(auto& it : ETheoretical_xsec){
+      EY[i] = it;
+      i++;
+  } 
+ X_ = new TVectorD();
+ X_->Use(Npoints,X);
+ Y_ = new TVectorD();
+ Y_->Use(Npoints,Y);
+ EX_ = new TVectorD();
+ EX_->Use(Npoints,EX);
+ EY_ = new TVectorD();
+ EY_->Use(Npoints,EY);
+
+ //Expected
+ Int_t Npoints_ = SignificanceP.size();
+ ExX = new Double_t[Npoints_];
+ ExY = new Double_t[Npoints_];
+ EXl = new Double_t[Npoints_];
+ EXr = new Double_t[Npoints_];
+ EYl = new Double_t[Npoints_];
+ EYr = new Double_t[Npoints_];
+ EYl2 = new Double_t[Npoints_];
+ EYr2 = new Double_t[Npoints_];
+
+  i=0;
+  for(auto& it : Chargino_mass){
+      ExX[i] = it;
+      EXl[i] = 0.;
+      EXr[i] = 0.;
+      i++;
+  } 
+  i=0;
+  for(auto& it : SignificanceP){
+      ExY[i] = it*Theoretical_xsec[i];
+      i++;
+  } 
+  i=0;
+  for(auto& it : HighErrorSignificance){
+      EYr[i] = it*Theoretical_xsec[i];
+      i++;
+  } 
+  i=0;
+  for(auto& it : LowErrorSignificance){
+      EYl[i] = it*Theoretical_xsec[i];
+      i++;
+  } 
+  i=0;
+  for(auto& it : HighErrorSignificance2){
+      EYr2[i] = it*Theoretical_xsec[i];
+      i++;
+  } 
+  i=0;
+  for(auto& it : LowErrorSignificance2){
+      EYl2[i] = it*Theoretical_xsec[i];
+      i++;
+  } 
+
+ ExX_ = new TVectorD();
+ ExX_->Use(Npoints_,ExX);
+
+ ExY_ = new TVectorD();
+ ExY_->Use(Npoints_,ExY);
+
+ EXl_ = new TVectorD();
+ EXl_->Use(Npoints_,EXl);
+
+ EYl_ = new TVectorD();
+ EYl_->Use(Npoints_,EYl); 
+
+ EXr_ = new TVectorD();
+ EXr_->Use(Npoints_,EXr);
+
+ EYr_ = new TVectorD();
+ EYr_->Use(Npoints_,EYr); 
+
+ EYl2_ = new TVectorD();
+ EYl2_->Use(Npoints_,EYl2); 
+ EYr2_ = new TVectorD();
+ EYr2_->Use(Npoints_,EYr2); 
+
+}
+
+void HMethods::PlotLimit(bool logscale){
+
+  FillVectors();
+
+  c = new TCanvas("c1", "",165,113,1015,547);
+  c->UseCurrentStyle(); 
+  
+  pad1 = new TPad("pad1", "pad1",0,0.04852686,1,1); 
+  pad1->Range(-62.40412,-57.37633,2230.179,136.5634); 
+  pad1->SetFillColor(0);
+  pad1->SetBorderMode(0);
+  pad1->SetBorderSize(2);
+  pad1->SetLeftMargin(0.112);
+  pad1->SetTopMargin(0.09);
+  pad1->SetBottomMargin(0.3);
+  pad1->SetFrameBorderMode(0);
+  if(logscale) pad1->SetLogy();
+  pad1->SetTickx(1);
+  pad1->SetTicky(1);
+  pad1->Draw(); 
+
+  c->cd();
+  pad1->cd();
+ 
+   TheoXsec = new TGraphErrors(*X_,*Y_,*EX_,*EY_);
+   TheoXsec->GetXaxis()->SetTitle("m(#tilde{#chi}^{#pm}_{1})[GeV]");
+   TheoXsec->GetXaxis()->SetRangeUser(100.,500.);
+   TheoXsec->GetYaxis()->SetTitle("#sigma [fb]");
+   TheoXsec->GetYaxis()->SetRangeUser(20.,100000.);
+   TheoXsec->SetTitle("");
+   TheoXsec->SetLineColor(4);
+   TheoXsec->SetLineWidth(2);
+   TheoXsec->SetMarkerColor(4);
+   TheoXsec->SetMarkerSize(1);
+   TheoXsec->SetMarkerStyle(7);
+   
+   Expected3 = new TGraphAsymmErrors(*ExX_,*ExY_,*EXl_,*EXr_,*EXl_,*EXr_);
+
+   Expected = new TGraphAsymmErrors(*ExX_,*ExY_,*EXl_,*EXr_,*EYl_,*EYr_);
+   Expected2 = new TGraphAsymmErrors(*ExX_,*ExY_,*EXl_,*EXr_,*EYl2_,*EYr2_);
+
+   Expected3->SetLineColor(1);
+   Expected3->SetLineWidth(3);
+   Expected3->SetLineStyle(2);
+
+   Expected->SetFillColor(kGreen);
+   Expected2->SetFillColor(kYellow);
+   
+   TheoXsec->Draw("APL"); 
+   Expected2->Draw("same31");
+   Expected->Draw("same31");
+   Expected3->Draw("sameL");
+   TheoXsec->Draw("same");
+ 
+}
+
+HMethods::~HMethods(){
+
+}

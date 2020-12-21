@@ -1,0 +1,22 @@
+CXX = `root-config --cxx`
+CXXFLAGS = `root-config --cflags` -fPIC -g
+ROOTLIBS = `root-config --glibs`
+SHARED = -shared
+SRCS = Histogram.cxx HistogramsDict.cxx
+HDRS = Histogram.h
+
+PROGRAM = Histograms.so
+
+all: $(PROGRAM)
+
+HistogramsDict.cxx: $(HDRS) LinkDef.h
+	@echo "Generating dictionary ..."
+	@rootcint -f $@ -c -p $^
+
+$(PROGRAM): $(SRCS)
+	@echo "Building $(PROGRAM) ..."
+	@rm -f $(PROGRAM)
+	@$(CXX) $(CXXFLAGS) $(SHARED) -o $@ $^ $(ROOTLIBS)
+	@echo "done"
+
+clean:; @rm -rf core *~ HistogramsDict* $(PROGRAM)

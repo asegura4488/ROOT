@@ -1,0 +1,74 @@
+#ifndef Hypotest_include_WORKSPACE_H
+#define Hypotest_include_WORKSPACE_H
+
+#include <TH1.h>
+#include <TFile.h>
+#include <TROOT.h>
+#include <RooWorkspace.h>
+#include <RooStats/HistFactory/Measurement.h>
+#include <RooStats/HistFactory/Sample.h>
+#include <RooStats/HistFactory/MakeModelAndMeasurementsFast.h>
+#include <RooStats/HistFactory/HistoToWorkspaceFactoryFast.h>
+
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+
+class Workspace{
+
+public:
+  Workspace();
+  ~Workspace();
+  void SetConfig(string path);
+  void Init(string path);
+  void ShowSizes();
+  void Load(string path_, string label_); 
+  TH1D* GetHisto(TFile *Source ,string path, string label);
+  void GetChannel(Int_t index, string label_);
+  void GetWorkspace();
+
+  UInt_t Data_s;
+  UInt_t MC_s;
+  UInt_t Sig_s;
+  UInt_t Sigb_s;
+  UInt_t Pseudo_s;
+
+private: 
+  std::string ConFolder; 
+  std::ifstream Input[2];
+
+  std::vector<string> Data_F;
+  std::vector<string> Bkg_F;
+  std::vector<string> Sig_F;
+  std::vector<string> Sigb_F;
+  std::vector<string> Pseudo_F;
+
+  
+  TFile *Data[50];
+  TFile *Bkg[50];
+  TFile *Sig[50];
+  TFile *SigB[50];
+  TFile *Pseudo[50];
+  TFile *Total_Bkg[1];
+
+  TH1D *HData[50];
+  TH1D *HBkg[50];
+  TH1D *HSig[50];
+  TH1D *HSigB[50];
+  TH1D *HPseudo[50];
+  TH1D *HTotal_Bkg[1]; 
+
+  RooStats::HistFactory::Measurement *Measure_;
+  RooStats::HistFactory::Data *Data_;
+  RooStats::HistFactory::Sample *TMC_;
+  RooStats::HistFactory::Sample *Signal_;
+  RooStats::HistFactory::Channel *Channel_;
+  RooStats::HistFactory::HistoToWorkspaceFactoryFast *H1;
+  RooWorkspace *w; 
+  
+
+};
+
+#endif

@@ -1,0 +1,178 @@
+#ifndef Hypotest_include_HMETHODS_H
+#define Hypotest_include_HMETHODS_H
+
+#include <TCanvas.h>
+#include <TPad.h>
+#include <TH2.h>
+#include <TFile.h>
+#include <TMatrixDSym.h>
+#include <TROOT.h>
+#include <TVectorD.h>
+#include <TGraphErrors.h>
+#include <TGraphAsymmErrors.h>
+
+#include <RooWorkspace.h>
+#include "RooRealVar.h"
+#include <RooStats/ModelConfig.h>
+#include <RooStats/ProfileLikelihoodCalculator.h>
+#include <RooStats/FrequentistCalculator.h> 
+#include <RooStats/BayesianCalculator.h> 
+#include <RooStats/SimpleInterval.h> 
+
+#include <RooStats/ProfileLikelihoodTestStat.h>
+#include <RooStats/LikelihoodInterval.h> 
+#include <RooStats/AsymptoticCalculator.h>
+#include <RooStats/HybridCalculator.h>
+#include <RooStats/ToyMCSampler.h>
+#include <RooStats/MCMCCalculator.h>
+#include <RooStats/MCMCInterval.h>
+#include <RooStats/HypoTestResult.h> 
+#include <RooStats/HypoTestInverter.h>
+#include <RooStats/HypoTestInverterResult.h>
+#include <RooStats/HypoTestInverterPlot.h>
+#include <RooStats/HistFactory/Sample.h>
+
+#include "RooPlot.h"
+#include "RooMinimizer.h"
+#include "RooFitResult.h"
+
+#include <iostream>
+#include <vector>
+#include <fstream>
+
+class HMethods{
+
+public:
+
+  HMethods();
+  ~HMethods();
+  void SetConfig(string path);
+  void Init(string path);
+  void InitXsec(string path);
+  void Show();
+  void InitWorkspaces(string name_);
+  void CreateModels(string data_, string alternative_);
+  Double_t GetLikelihood(Int_t index);
+  Double_t GetFrequentist(Int_t index);
+  Double_t GetBayesian(Int_t index);
+  Double_t GetProfile(Int_t index);
+  Double_t GetAsymtotic(Int_t index);
+  Double_t GetHybrid(Int_t index);
+  Double_t GetMarkov(Int_t index, Double_t Confidence);
+  void GetHypoTest(Int_t value, string method);
+  void ShowSignificance();
+  void ShowUpperVector();
+  void FillVectors();
+  void PlotLimit(bool logscale);
+
+
+private:
+ 
+ //Input 
+ std::string ConFolder; 
+ std::ifstream Input[2]; 
+ std::vector<string> Work_F;
+
+ TFile *File_[50];
+ RooWorkspace *W_[50];
+
+ //Model
+ RooAbsData *data[50]; 
+ RooStats::ModelConfig *sbModel[50];
+ RooRealVar *Pois[50];
+ RooRealVar *Poib[50];
+ RooStats::ModelConfig* bModel[50];
+ RooRealVar *Sigma;
+
+ // Methods 
+ //Likelihood
+ RooAbsPdf *MCpdf;
+ RooMinimizer *Minimizer;
+ RooFitResult *result_like;
+ TCanvas* c1;  
+ // frequentist
+ RooStats::FrequentistCalculator *freq;
+ RooStats::ProfileLikelihoodTestStat *profile;
+ //Bayesian
+ RooStats::BayesianCalculator *BayesCalc; 
+ RooStats::SimpleInterval *SimpleI; 
+
+ // ProfileLikelihood
+ RooStats::ProfileLikelihoodCalculator *plc;
+ RooStats::LikelihoodInterval *interval_; 
+ // Asymtotic
+ RooStats::AsymptoticCalculator *AsymCalc;
+ 
+ // Hybrid Method
+ RooStats::HybridCalculator *hc;
+ RooStats::ToyMCSampler *ToyMC;
+ // Markov MC
+ RooStats::MCMCCalculator *Mmc;
+ RooStats::MCMCInterval *Mmcint;
+
+ // Inverter
+ RooStats::HypoTestInverter *Inverter;
+ RooStats::HypoTestInverterResult *Iresult;
+
+ //Plot
+ RooStats::HypoTestInverterPlot *Plot; 
+
+ // Generic result
+ RooStats::HypoTestResult *result;
+ 
+ std::vector<Double_t> SignificanceP;
+ std::vector<Double_t> HighErrorSignificance;
+ std::vector<Double_t> LowErrorSignificance;
+ std::vector<Double_t> HighErrorSignificance2;
+ std::vector<Double_t> LowErrorSignificance2;
+
+ std::vector<Double_t> UpperVector;
+ //Xsec
+ std::vector<Double_t> Chargino_mass;
+ std::vector<Double_t> Theoretical_xsec;
+ std::vector<Double_t> ETheoretical_xsec;
+
+ Double_t *X;
+ TVectorD *X_;
+ Double_t *Y;
+ TVectorD *Y_; 
+ Double_t *EX;
+ TVectorD *EX_;
+ Double_t *EY;
+ TVectorD *EY_;
+
+ TCanvas *c;
+ TPad *pad1;
+ TGraphErrors *TheoXsec;
+ TGraphAsymmErrors *Expected;
+ TGraphAsymmErrors *Expected2;
+ TGraphAsymmErrors *Expected3; 
+
+ Double_t *ExX;
+ TVectorD *ExX_;
+
+ Double_t *ExY;
+ TVectorD *ExY_; 
+
+ Double_t *EXl;
+ TVectorD *EXl_;
+
+ Double_t *EYl;
+ TVectorD *EYl_;
+ Double_t *EYl2;
+ TVectorD *EYl2_;
+
+ Double_t *EXr;
+ TVectorD *EXr_;
+
+ Double_t *EYr;
+ TVectorD *EYr_;
+ Double_t *EYr2;
+ TVectorD *EYr2_;
+ 
+ 
+
+};
+
+
+#endif
