@@ -9,8 +9,9 @@ class Neurona{
 public:
 
 	Neurona();
-	Neurona(double alpha_, uint size_);
+	Neurona(int ID_, double alpha_, uint size_);
 	~Neurona();
+  int GetID();
 	void InitWeights();
 	void SetWeights(double Entries[], int Expected);
 	void SwapWeights();
@@ -32,6 +33,7 @@ private:
     // peso = ppeso + tasa aprendizaje*error*entrada
 	double alpha;
 	uint size;
+  int ID;
 
 };
 
@@ -47,7 +49,7 @@ Neurona::Neurona(){
 
 }
 
-Neurona::Neurona(double alpha_,uint size_): alpha(alpha_), size(size_){
+Neurona::Neurona(int ID_, double alpha_,uint size_): ID(ID_), alpha(alpha_), size(size_){
 
 	rnd = new TRandom3();
 	rnd->SetSeed(0);
@@ -58,6 +60,8 @@ Neurona::Neurona(double alpha_,uint size_): alpha(alpha_), size(size_){
 }
 
 Neurona::~Neurona(){}
+
+int Neurona::GetID(){return ID;}
 
 void Neurona::InitWeights(){
 
@@ -121,14 +125,65 @@ int Neurona::Output(double Entries[]){
 }
 
 
+//////////////////////////////////////////////////////////////////
+/// Layer class
+#ifndef Layer_H
+#define Layer_H
+
+class Layer{
+
+  public:
+
+    Layer();
+    Layer(int Entries, uint NumberN);
+    ~Layer();
+    Neurona *GetNeurona(int id);
+
+    Neurona **Neuronas;
+
+  private:
+
+    
+
+};
+
+#endif
+
+Layer::Layer(){}
+
+Layer::Layer(int Entries, uint NumberN){
+
+  Neuronas = new Neurona*[NumberN];
+
+  for (uint i = 0; i < NumberN; i++){
+    Neurona *N = new Neurona(i,0.1,Entries);
+    N->InitWeights();
+    Neuronas[i] = N;
+  }
 
 
-void NeuronaClass(){
+}
 
-  int Nneu = 2;
-  Neurona *AllNeuronas[Nneu];
+Layer::~Layer(){}
 
-  Neurona *N1 = new Neurona(0.05,2);
+Neurona* Layer::GetNeurona(int id){
+  return Neuronas[id];
+}
+
+
+
+
+
+/////////////////// Main function /////////////////////////
+
+void LayerClass(){
+
+  Layer *L1 = new Layer(2,2); 
+  cout << L1->GetNeurona(0)->GetID() << endl;
+  L1->GetNeurona(0)->ShowWeights();
+
+  Neurona *N1 = new Neurona(1,0.05,2);
+  //cout << N1->GetID() << endl;
   N1->InitWeights();
 
   bool control = false;
@@ -181,14 +236,14 @@ void NeuronaClass(){
   	exit(1); 
   }
 
-  cout << it << endl;
-  N1->ShowWeights();
+  //cout << it << endl;
+  //N1->ShowWeights();
 
 
 }
 
 
 int main(){
-	NeuronaClass();
+	LayerClass();
 	return 0;
 }
