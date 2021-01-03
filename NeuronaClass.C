@@ -9,7 +9,7 @@ class Neurona{
 public:
 
 	Neurona();
-	Neurona(double Threshold_);
+	Neurona(double Threshold_, double alpha_);
 	~Neurona();
 	void GetWeights();
 	void SetWeights(double Entries[], int Eout);
@@ -24,11 +24,13 @@ public:
 	double Threshold;
 	double PThreshold;
 
+	TH1D *h1;
+
 private:
 	TRandom3 *rnd; 
 
     // peso = ppeso + tasa aprendizaje*error*entrada
-	double alpha = 0.3;
+	double alpha;
 
 };
 
@@ -45,15 +47,15 @@ Neurona::Neurona(){
     PThreshold = rnd->Uniform(-1.,1.);
 }
 
-Neurona::Neurona(double Threshold_): Threshold(Threshold_){
+Neurona::Neurona(double Threshold_, double alpha_): Threshold(Threshold_), alpha(alpha_){
 	rnd = new TRandom3();
 	rnd->SetSeed(0);
 
 	for( uint i = 0; i < 2; i++ ){
-		PWeights[i] = rnd->Uniform(0.,1.);	
+		PWeights[i] = rnd->Uniform(-1.,1.);	
 	}
 
-	PThreshold = rnd->Uniform(0.,1.);
+	PThreshold = rnd->Uniform(-1.,1.);
 }
 
 Neurona::~Neurona(){
@@ -126,7 +128,7 @@ void NeuronaClass(){
   int Nneu = 2;
   Neurona *AllNeuronas[Nneu];
 
-  Neurona *N1 = new Neurona(0.);
+  Neurona *N1 = new Neurona(0., 0.2);
 
   bool control = false;
 
@@ -156,11 +158,11 @@ void NeuronaClass(){
   		control = false;
   	}
   	if(N1->Output(Entry2) != 1){
-  		N1->SetWeights(Entry2,0);
+  		N1->SetWeights(Entry2,1);
   		control = false;
   	}
   	if(N1->Output(Entry3) != 1){
-  		N1->SetWeights(Entry3,0);
+  		N1->SetWeights(Entry3,1);
   		control = false;
   	}
   	if(N1->Output(Entry4) != 0){
