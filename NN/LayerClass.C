@@ -16,8 +16,8 @@ public:
 	void SetWeights(double Entries[], int Expected);
 	void SwapWeights();
 	void ShowWeights();
-    int Activation(double x);
-    double Propagation(double Entries[]);
+  int Activation(double x);
+  double Propagation(double Entries[]);
 	int Output(double Entries[]);
 
 	double *Weights;
@@ -135,16 +135,20 @@ class Layer{
   public:
 
     Layer();
-    Layer(int Entries, uint NumberN);
+    Layer(int Entries, int NumberN_);
     ~Layer();
+
     Neurona *GetNeurona(int id);
+
+    int GetNumberN();
+
+    double *Output(double Entries[], double Salida[]);
 
     Neurona **Neuronas;
 
-    double Output(double Entries[], int id);
-
   private:
 
+    int NumberN;
     
 
 };
@@ -153,11 +157,11 @@ class Layer{
 
 Layer::Layer(){}
 
-Layer::Layer(int Entries, uint NumberN){
+Layer::Layer(int Entries, int NumberN_): NumberN(NumberN_){
 
-  Neuronas = new Neurona*[NumberN];
+  Neuronas = new Neurona*[NumberN_];
 
-  for (uint i = 0; i < NumberN; i++){
+  for (uint i = 0; i < NumberN_; i++){
     Neurona *N = new Neurona(i,0.1,Entries);
     N->InitWeights();
     Neuronas[i] = N;
@@ -172,8 +176,19 @@ Neurona* Layer::GetNeurona(int id){
   return Neuronas[id];
 }
 
-double Layer::Output(double Entries[], int id){
-  return Layer::GetNeurona(id)->Neurona::Output(Entries);
+int Layer::GetNumberN(){
+  return NumberN;
+}
+
+double *Layer::Output(double Entries[], double Salida[]){
+
+  for(int i = 0; i < NumberN; i++){
+   // cout << i << " iterando la neurona " << endl;
+    Salida[i] = Layer::GetNeurona(i)->Neurona::Output(Entries);
+  }
+
+    return Salida;
+
 }
 
 //////////////////////////////////////////////////////////////////
@@ -196,7 +211,7 @@ class Perceptron{
 
   private:
 
-    double *Salida;
+    
 
     
 
@@ -211,24 +226,41 @@ Perceptron::Perceptron(int EEntries, uint NeuronasbyLayers[], int NumberLayers){
   Layers = new Layer*[NumberLayers];
 
   Layers[0] = new Layer(EEntries,NeuronasbyLayers[0]);
+  //cout << Layers[0]->GetNumberN() << " numero neuronas " <<endl;
 
   for (uint i = 1; i < NumberLayers; i++){
     Layer *L = new Layer(NeuronasbyLayers[i-1],NeuronasbyLayers[i]); 
     Layers[i] = L;
+   // cout << Layers[i]->GetNumberN() << " numero de neuronas " <<endl;
   }
 
-  // array para salidas del perceptron
-  Salida = new double[NumberLayers];
+  
 
 }
 
 double Perceptron::Output(double EEntries[],int NumberLayers){
 
-  Salida[0] = Layers[0]->Output(EEntries,0);
+  int size = Layers[0]->GetNumberN();
+  cout << Layers[0]->GetNumberN() << " numero neuronas " << endl;
+  double Salida[size];
+  //Salida = new double[Layers[1]->GetNumberN()];
 
-  for (uint i = 1; i < NumberLayers; i++){
-    Salida[i] = Layers[i]->Output(&Salida[i-1],i);
-  }
+  Layers[0]->Output(EEntries,Salida);
+
+  cout << Salida[0] << " primera  " << Salida[1] <<endl;
+
+  double Salida2[Layers[1]->GetNumberN()];
+  Layers[1]->Output(Salida,Salida2);
+ 
+  cout << Salida2[0] << " final" <<endl;
+
+
+  //for (uint i = 1; i < NumberLayers; i++){
+  //  Salida[i] = Layers[i]->Output(&Salida[i-1],i);
+  //}
+  //cout << Salida[0] << " salida1 "  <<endl;
+
+  //delete[] Salida;
 
   return 0;
 }
@@ -258,7 +290,13 @@ void LayerClass(){
   double Entry3[2] = {1.,0.};
   double Entry4[2] = {0.,0.};
 
-  cout << L1->Output(Entry1,0) << endl;
+  double out[2] = {0};
+  L1->Output(Entry1,out);
+  //cout << out[0] << " que paso " << out[1] << endl;
+
+  uint capas[2] = {2,1};
+  Perceptron *p1 = new Perceptron(2,capas,2);
+  p1->Output(Entry1,2);
 
 
   int it = 0;
