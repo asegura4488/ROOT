@@ -148,6 +148,8 @@ class Layer{
 
     void SetWeights();
 
+    void ShowWeights();
+
     Neurona **Neuronas;
 
   private:
@@ -205,6 +207,12 @@ void Layer::SetWeights(){
 	Layer::GetNeurona(i)->Neurona::InitWeights();
 }
 
+void Layer::ShowWeights(){
+
+	for(int i = 0; i < NumberN; i++)
+	Layer::GetNeurona(i)->Neurona::ShowWeights();
+}
+
 void Layer::SwapWeightsLayer(){
 	for(int i = 0; i < NumberN; i++){
 		Layer::GetNeurona(i)->Neurona::SwapWeights();
@@ -231,6 +239,7 @@ class Perceptron{
     void PrintOutput(int Layers[], int NumberLayers);
 
     void SetWeights(int NumberLayers);
+    void ShowWeights(int NumberLayers);
     void SwapWeights(int NumberLayers);
 
   private:
@@ -307,6 +316,13 @@ void Perceptron::SetWeights(int NumberLayers){
 	}
 }
 
+void Perceptron::ShowWeights(int NumberLayers){
+	for(int i = 0; i < NumberLayers; i++){
+		std::cout << " Layer: " << i << std::endl;
+		Layers[i]->Layer::ShowWeights();
+	}
+}
+
 void Perceptron::SwapWeights(int NumberLayers){
 	for(int i = 0; i < NumberLayers; i++){
 		Layers[i]->Layer::SwapWeightsLayer();
@@ -374,7 +390,7 @@ void LayerClass(){
 
   	p1->SwapWeights(2);
   	it++;
-    cout << it << endl;
+    //cout << it << endl;
   }
 
   if(it == 10000){
@@ -392,6 +408,7 @@ void LayerClass(){
   p1->Output(Entry4,2);
   p1->PrintOutput(capas,2);
 
+  p1->ShowWeights(2);
 
 }
 
