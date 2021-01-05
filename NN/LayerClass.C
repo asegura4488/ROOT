@@ -72,6 +72,7 @@ void Neurona::InitWeights(){
 
    Threshold  = rnd->Uniform(-1.,1.);
    PThreshold = rnd->Uniform(-1.,1.);
+  // cout << Threshold << endl;
 
 }
 
@@ -301,6 +302,7 @@ double Perceptron::Output(double EEntries[],int NumberLayers){
 
 void Perceptron::PrintOutput(int Layers[], int NumberLayers){
 
+    std::cout << " ----------------- " << std::endl; 
    for(int i = 0; i < NumberLayers; i++){
   	std::cout << " Capa: " << i << std::endl; 
   	for(int j = 0; j < Layers[i]; j++){
@@ -318,6 +320,7 @@ void Perceptron::SetWeights(int NumberLayers){
 
 void Perceptron::ShowWeights(int NumberLayers){
 	for(int i = 0; i < NumberLayers; i++){
+		std::cout << " ************* " << std::endl; 
 		std::cout << " Layer: " << i << std::endl;
 		Layers[i]->Layer::ShowWeights();
 	}
@@ -358,9 +361,10 @@ void LayerClass(){
   L1->Output(Entry1,out);
   //cout << out[0] << " que paso " << out[1] << endl;
 
-  int capas[2] = {2,1};
-  Perceptron *p1 = new Perceptron(2,capas,2);
-  p1->Output(Entry1,2);
+  int capas[2] = {3,1};
+  int NCapas = 2;
+  Perceptron *p1 = new Perceptron(2,capas,NCapas);
+  p1->Output(Entry1,NCapas);
   //p1->PrintOutput(capas,2);
 
 
@@ -370,25 +374,25 @@ void LayerClass(){
   	control = true;
 
     
-  	if(p1->Output(Entry1,2) != 1){
-  		p1->SetWeights(2);
+  	if(p1->Output(Entry1,NCapas) != 0){
+  		p1->SetWeights(NCapas);
   		control = false;
   	}
-  	if(p1->Output(Entry2,2) != 0){
-  		p1->SetWeights(2);
+  	if(p1->Output(Entry2,NCapas) != 1){
+  		p1->SetWeights(NCapas);
   		control = false;
   	}
-  	if(p1->Output(Entry3,2) != 0){
-  		p1->SetWeights(2);
+  	if(p1->Output(Entry3,NCapas) != 1){
+  		p1->SetWeights(NCapas);
   		control = false;
   	}
-  	if(p1->Output(Entry4,2) != 0){
-  		p1->SetWeights(2);
+  	if(p1->Output(Entry4,NCapas) != 0){
+  		p1->SetWeights(NCapas);
   		control = false;
   	}
   	
 
-  	p1->SwapWeights(2);
+  	p1->SwapWeights(NCapas);
   	it++;
     //cout << it << endl;
   }
@@ -399,16 +403,16 @@ void LayerClass(){
   }
 
   cout << it << endl;
-  p1->Output(Entry1,2);
-  p1->PrintOutput(capas,2);
-  p1->Output(Entry2,2);
-  p1->PrintOutput(capas,2);
-  p1->Output(Entry3,2);
-  p1->PrintOutput(capas,2);
-  p1->Output(Entry4,2);
-  p1->PrintOutput(capas,2);
+  p1->Output(Entry1,NCapas);
+  p1->PrintOutput(capas,NCapas);
+  p1->Output(Entry2,NCapas);
+  p1->PrintOutput(capas,NCapas);
+  p1->Output(Entry3,NCapas);
+  p1->PrintOutput(capas,NCapas);
+  p1->Output(Entry4,NCapas);
+  p1->PrintOutput(capas,NCapas);
 
-  p1->ShowWeights(2);
+  p1->ShowWeights(NCapas);
 
 }
 
