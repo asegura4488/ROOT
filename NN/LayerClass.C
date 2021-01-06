@@ -247,6 +247,8 @@ class Perceptron{
 
     double **OutputByLayer;
 
+  	
+
     
 
 };
@@ -269,6 +271,7 @@ Perceptron::Perceptron(double EEntries, int NeuronasbyLayers[], int NumberLayers
    // cout << Layers[i]->GetNumberN() << " numero de neuronas " <<endl;
   }
 
+  
   // Create the output arrays
   for(int i = 0; i < NumberLayers; i++){
 
@@ -278,7 +281,7 @@ Perceptron::Perceptron(double EEntries, int NeuronasbyLayers[], int NumberLayers
 
   	OutputByLayer[i] = out;
 
-  	delete[] out;
+  	//delete[] out;
 
   }
 
