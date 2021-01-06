@@ -300,7 +300,7 @@ double Perceptron::Output(double EEntries[],int NumberLayers){
   //cout << OutputByLayer[1][0] << " final" <<endl;
 
 
-  return OutputByLayer[1][0];
+  return OutputByLayer[NumberLayers-1][0];
 }
 
 void Perceptron::PrintOutput(int Layers[], int NumberLayers){
@@ -364,8 +364,8 @@ void LayerClass(){
   L1->Output(Entry1,out);
   //cout << out[0] << " que paso " << out[1] << endl;
 
-  int capas[2] = {3,1};
-  int NCapas = 2;
+  int capas[4] = {4,5,3,1};
+  int NCapas = 4;
   Perceptron *p1 = new Perceptron(2,capas,NCapas);
   p1->Output(Entry1,NCapas);
   //p1->PrintOutput(capas,2);
@@ -377,19 +377,19 @@ void LayerClass(){
   	control = true;
 
     
-  	if(p1->Output(Entry1,NCapas) != 0){
+  	if(p1->Output(Entry1,NCapas) != 1){
   		p1->SetWeights(NCapas);
   		control = false;
   	}
-  	if(p1->Output(Entry2,NCapas) != 1){
+  	if(p1->Output(Entry2,NCapas) != 0){
   		p1->SetWeights(NCapas);
   		control = false;
   	}
-  	if(p1->Output(Entry3,NCapas) != 1){
+  	if(p1->Output(Entry3,NCapas) != 0){
   		p1->SetWeights(NCapas);
   		control = false;
   	}
-  	if(p1->Output(Entry4,NCapas) != 0){
+  	if(p1->Output(Entry4,NCapas) != 1){
   		p1->SetWeights(NCapas);
   		control = false;
   	}
