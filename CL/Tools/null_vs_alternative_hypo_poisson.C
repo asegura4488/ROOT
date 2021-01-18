@@ -13,7 +13,8 @@ void null_vs_alternative_hypo_poisson(){
 
   std::cout << "CL_s+b(x=7; lambda) = " << falt->Integral(-50,7) << std::endl;
   std::cout << "CL_b(x=7; lambda) = " << fga->Integral(7,50) << std::endl;
- 
+  std::cout << "CL " << falt->Integral(-50,7)/fga->Integral(7,50)  << std::endl;
+
   cout<<"alpha:"<<fga->Integral(7, 50) 
       <<" total:"<<fga->Integral(0, 50) 
       <<" "<<fga->Integral(7, 50)/fga->Integral(0, 50)  <<endl; 
@@ -32,6 +33,7 @@ void null_vs_alternative_hypo_poisson(){
    for (int i=0; i<=100; ++i){
      g->SetPoint(i, 7+6.*(double)i/100., fga->Eval(7+6.*(double)i/100.));
      a->SetPoint(i, 7-7.*(double)i/100., falt->Eval(7-7.*(double)i/100.));
+    // cout << 7+6.*(double)i/100. << " segundo " << 7-7.*(double)i/100. << endl;
    }  
    g->SetPoint(101,11,0);
    g->SetPoint(102,7,0);
@@ -39,6 +41,7 @@ void null_vs_alternative_hypo_poisson(){
    a->SetPoint(101,3,0);
    a->SetPoint(102,7,0);
    a->SetFillColor(5);
+
 
   h->Draw();
   text.SetTextSize(0.04);   
@@ -49,6 +52,7 @@ void null_vs_alternative_hypo_poisson(){
   text.SetTextColor(4);
   text.SetTextSize(0.06);   
   text.DrawLatex(7.8,0.048, "#alpha");   
+
   g->Draw("lf,same");
   a->Draw("lf,same");
   fga->Draw("l,same");

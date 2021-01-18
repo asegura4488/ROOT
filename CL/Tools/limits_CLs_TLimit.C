@@ -54,5 +54,6 @@ void limits_CLs_TLimit(){
   line.SetLineWidth(2);
   line.DrawLine( upper_limit_signal_CLs, 0.14, upper_limit_signal_CLs, 0.0);  
 
-  c1->SaveAs("limits_CLs_TLimit.png");
+  c1->SaveAs("limit.png");
+  c1->Clear();
 }
