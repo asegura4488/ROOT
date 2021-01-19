@@ -35,7 +35,7 @@ void asym(){
    inverter.SetConfidenceLevel(0.95);
    inverter.UseCLs(true);
    inverter.SetVerbose(true);
-   inverter.SetFixedScan(200,0.0,2.0);
+   inverter.SetFixedScan(200,0.0,3.0);
    RooStats::HypoTestInverterResult* result =  inverter.GetInterval();
 
 

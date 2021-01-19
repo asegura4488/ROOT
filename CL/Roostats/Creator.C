@@ -15,24 +15,24 @@ void Creator(){
 */
 
 
-   TH1D *hdata = new TH1D("hdata","hdata", 2, 0. , 20.);
+   TH1D *hdata = new TH1D("hdata","hdata", 1, 0. , 20.);
    hdata->Sumw2();
-   TH1D *hbkg = new TH1D("hbkg","hbkg", 2, 0. , 20.);
+   TH1D *hbkg = new TH1D("hbkg","hbkg", 1, 0. , 20.);
    hbkg->Sumw2();
-   TH1D *hsignal = new TH1D("hsignal","hsignal", 2, 0. , 20.);
+   TH1D *hsignal = new TH1D("hsignal","hsignal", 1, 0. , 20.);
    hsignal->Sumw2();
 
 
-   for(int i = 0; i < 300; i++){
+   for(int i = 0; i < 9; i++){
  	 hdata->Fill(1);
          }
-   for(int i = 0; i < 290; i++) { 
+   for(int i = 0; i < 7; i++) { 
          hbkg->Fill(2);
 	 }
-   for(int i = 0; i < 60; i++) {
+   for(int i = 0; i < 10; i++) {
  	 hsignal->Fill(4);
 	 }
-
+/*
    for(int i = 0; i < 100; i++){
  	 hdata->Fill(11);
          }
@@ -42,7 +42,7 @@ void Creator(){
    for(int i = 0; i < 150; i++) {
  	 hsignal->Fill(15);
 	 }
-
+*/
 
    hdata->Draw();
    hdata->GetYaxis()->SetRangeUser(0.,320.);
@@ -81,7 +81,7 @@ void Creator(){
    TMC_->SetHisto(hbkg);
 
    RooStats::HistFactory::Sample *Signal_ = new RooStats::HistFactory::Sample("Signal_");
-   Signal_->AddNormFactor("mu",1,0.,10);
+   Signal_->AddNormFactor("mu",1,0.,10.);
  //  Signal_->AddOverallSys("AccSys", 0.95, 1.05);
    Signal_->SetHisto(hsignal);
 
