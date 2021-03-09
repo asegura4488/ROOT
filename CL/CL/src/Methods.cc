@@ -151,6 +151,9 @@ Double_t Methods::GetFrequestistLnQ(Double_t mu){
   Nsignal2 = Nsignal1;
 
   ObsLnQ = GetLnQ(Ndata, Nbkg, mu);
+
+  std::cout << "Observado: " << ObsLnQ << std::endl;
+
   double ObsLnQ2 = GetLnQ2(Ndata1, Nbkg1, mu) ;
    
   //ObsLnQ += ObsLnQ2;
@@ -182,7 +185,9 @@ Double_t Methods::GetFrequestistLnQ(Double_t mu){
 
     }while(temp <= 0. || templ <= 0.);
 
- 
+    templ = 1.0; 
+
+
     GenDb = rnd->PoissonD(temp*templ);
     GenDb += rnd->Gaus(0., 0.05);
     GenDsb = rnd->PoissonD(   (temp + mu*Nsignal) *templ );
@@ -615,21 +620,21 @@ void Methods::Plotter(){
  // c1->Clear();
 
   c1->cd(1);
-  /*
+  
   PlotHistos(Hbkg, 0);
   PlotHistos(Hsbkg, 1);
   PlotHistos(HObs, 2);
-*/
+
 
   c1->Modified();
   c1->Update(); 
 
   c1->cd(2);
-/*
+
   PlotHistos(Hq0b, 0);
   PlotHistos(Hq0sb, 1);
   PlotHistos(Hq0median, 2);
-*/
+
   PlotHistos(BNorm,0);
   PlotHistos(BPosterior,1);
   PlotHistos(mup,2);

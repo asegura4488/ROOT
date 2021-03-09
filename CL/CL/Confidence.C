@@ -1,6 +1,7 @@
 void Confidence(){
 
-   	Methods *test1 = new Methods(2000.,1900.,300.);
+   	//Methods *test1 = new Methods(2000.,1900.,300.);
+   	Methods *test1 = new Methods(10.,8.,15.);
    // Methods *test1 = new Methods(147., 140., 58.);
    //  Methods *test1 = new Methods(400.,400.,100.);
    //  Methods *test1 = new Methods(300.,290.,60.);
@@ -17,7 +18,7 @@ void Confidence(){
 */
    // limit_ = test1->GetLimit(0.95, 4, 0.1);
 
-     limit_ = test1->GetLimit(0.95, 6 , 0.5);
+     limit_ = test1->GetLimit(0.95, 4 , 0.5);
     
     cout << " limit2 " << limit_ << " " << limit_*test1->GetNsignal() << endl;
   
