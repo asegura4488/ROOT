@@ -37,13 +37,13 @@ void CLs(){
     }
 
    
-    freqCalc.SetToys(10000,2000) ;
+    freqCalc.SetToys(3000,3000) ;
 
     RooStats::HypoTestInverter inverter(freqCalc);
     inverter.SetConfidenceLevel(0.95);
     inverter.UseCLs(true);
     inverter.SetVerbose(false);
-    inverter.SetFixedScan(15.0,1.0,2.5);
+    inverter.SetFixedScan(20.0,0.0,1.0);
     RooStats::HypoTestInverterResult* result =  inverter.GetInterval();
 
    

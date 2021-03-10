@@ -23,13 +23,13 @@ void Creator(){
    hsignal->Sumw2();
 
 
-   for(int i = 0; i < 9; i++){
+   for(int i = 0; i < 10; i++){
  	 hdata->Fill(1);
          }
-   for(int i = 0; i < 7; i++) { 
+   for(int i = 0; i < 8; i++) { 
          hbkg->Fill(2);
 	 }
-   for(int i = 0; i < 10; i++) {
+   for(int i = 0; i < 20; i++) {
  	 hsignal->Fill(4);
 	 }
 /*
@@ -70,7 +70,7 @@ void Creator(){
    Measure_->SetOutputFilePrefix( "measure" );
    Measure_->SetPOI("mu");	
    Measure_->SetLumi(1.0);
-   Measure_->SetLumiRelErr(0.025);
+   Measure_->SetLumiRelErr(0.0);
    Measure_->AddConstantParam("Lumi");
 
    RooStats::HistFactory::Data *Data_ = new RooStats::HistFactory::Data();
@@ -81,7 +81,7 @@ void Creator(){
    TMC_->SetHisto(hbkg);
 
    RooStats::HistFactory::Sample *Signal_ = new RooStats::HistFactory::Sample("Signal_");
-   Signal_->AddNormFactor("mu",1,0.,10.);
+   Signal_->AddNormFactor("mu",1,0.,3.);
  //  Signal_->AddOverallSys("AccSys", 0.95, 1.05);
    Signal_->SetHisto(hsignal);
 

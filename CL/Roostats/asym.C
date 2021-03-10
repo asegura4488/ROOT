@@ -35,7 +35,7 @@ void asym(){
    inverter.SetConfidenceLevel(0.95);
    inverter.UseCLs(true);
    inverter.SetVerbose(true);
-   inverter.SetFixedScan(200,0.0,3.0);
+   inverter.SetFixedScan(40,0.0,1.0);
    RooStats::HypoTestInverterResult* result =  inverter.GetInterval();
 
 
@@ -50,11 +50,11 @@ void asym(){
 
    double Pvalue = result_->NullPValue();
 
-   cout << 100*inverter.ConfidenceLevel() << "%  upper limit : " << result->UpperLimit() << endl;
+   cout << 100*inverter.ConfidenceLevel() << "  upper limit : " << result->UpperLimit() << endl;
    std::cout << " expected limit (median) " << result->GetExpectedUpperLimit(0) << std::endl;
 
    cout << "Significance_ "<< Significance_ << "+-" << errorS <<  endl;
-   cout << " Pvalue "  << Pvalue << " " << -TMath::NormQuantile(Pvalue) << endl;
+   cout << " Pvalue "  << Pvalue << " " << TMath::NormQuantile(1.-Pvalue) << endl;
 
 
 }
