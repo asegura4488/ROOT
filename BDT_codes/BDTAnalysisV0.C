@@ -8,31 +8,36 @@
 #include "TMVA/Reader.h"
 #include "TMVA/Factory.h"
 
+
+ #include "TMVA/DataLoader.h"//required to load dataset
+ 
+
 void BDTAnalysisV0()
 {
 
   TChain * ch = new TChain("ntuple","");
 
-  // ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/recofinalBs.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab2_ks0.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab3_ks0.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab4_ks0.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab5_ks0_1000.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab5_ks0_1200.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab5_ks0_1400.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab5_ks0_1600.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab5_ks0_1800.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab5_ks0_200.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab5_ks0_400.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab5_ks0_600.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab5_ks0_800.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1800.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_200.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_400.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_600.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_800.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab2_ks0.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab3_ks0.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab4_ks0.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1000.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1200.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1400.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1600.root/mkcands/ntuple");
+  
+  //ch->Add("/home/alejandro/Bd/datos_ks0/recofinalBs.root/mkcands/ntuple");
 
   TTree *tree = (TTree*)ch;
 
   DataBd tB(tree);
 
   TChain * chS = new TChain("ntuple","");
-chS->Add("/home/alejandro/Documentos/Bd/outputMC_ks0_cern.root/mkcands/ntuple");
+chS->Add("/home/alejandro/Bd/outputMC_ks0_cern.root/mkcands/ntuple");
 
 
   TTree *treeSignal = (TTree*)chS;
@@ -351,23 +356,25 @@ chS->Add("/home/alejandro/Documentos/Bd/outputMC_ks0_cern.root/mkcands/ntuple");
    TMVA::Factory *factory = new TMVA::Factory( "BDTAnalysisv4-test", outputFile, Form("!V:!Silent:%sColor", gROOT->IsBatch()?"!":"") );
    //TMVA::Factory *factory = new TMVA::Factory( "MVAnalysis-test-new-bdt", outputFile, "" ) ;
    
-   factory->AddVariable("v0", "P_{T}(K_{1}^{0})",'F');
-   factory->AddVariable("v1", "#eta(K_{1}^{0})",  'F');
-   factory->AddVariable("v2", "#phi(K_{1}^{0})", 'F');
-   factory->AddVariable("v3", "P_{T}(K_{2}^{0})", 'F');
+   TMVA::DataLoader *dataloader=new TMVA::DataLoader("dJ");
+
+   dataloader->AddVariable("v0", "P_{T}(K_{1}^{0})",'F');
+   dataloader->AddVariable("v1", "#eta(K_{1}^{0})",  'F');
+   dataloader->AddVariable("v2", "#phi(K_{1}^{0})", 'F');
+   dataloader->AddVariable("v3", "P_{T}(K_{2}^{0})", 'F');
    //factory->AddVariable("v4", "#eta(K_{0})", 'F');
-   factory->AddVariable("v5", "#phi(K_{2}^{0})",  'F');
+   dataloader->AddVariable("v5", "#phi(K_{2}^{0})",  'F');
    //factory->AddVariable("v6", "#eta(K_{0})", 'F');
    //factory->AddVariable("v7", "#eta(K_{0})", 'F');
    //factory->AddVariable("v8", "#eta(K_{0})", 'F');
-   factory->AddVariable("v9", "#chi^{2}(K^{0}_{s})",  'F');
-   factory->AddVariable("v10","#chi^{2}(J/ #phi)",  'F');
-   factory->AddVariable("v11","#chi^{2}(B^{0})", 'F');
+   dataloader->AddVariable("v9", "#chi^{2}(K^{0}_{s})",  'F');
+   dataloader->AddVariable("v10","#chi^{2}(J/ #phi)",  'F');
+   dataloader->AddVariable("v11","#chi^{2}(B^{0})", 'F');
    //factory->AddVariable("v12", "#eta(K_{0})", 'F');
-   factory->AddVariable("v13", "#Delta(B.K^{0}_{2})", 'F');
-   factory->AddVariable("v14", "#Delta(K^{0}_{1}.K^{0}_{2})", 'F');
+   dataloader->AddVariable("v13", "#Delta(B.K^{0}_{2})", 'F');
+   dataloader->AddVariable("v14", "#Delta(K^{0}_{1}.K^{0}_{2})", 'F');
    //factory->AddVariable("v15", 'F');
-   factory->AddVariable("v16","#Delta(B.#mu)",  'F');
+   dataloader->AddVariable("v16","#Delta(B.#mu)",  'F');
    //  factory->AddVariable("v17", 'F');
    //  factory->AddVariable("v18", 'F');
    //  factory->AddVariable("v19", 'F');
@@ -384,23 +391,28 @@ chS->Add("/home/alejandro/Documentos/Bd/outputMC_ks0_cern.root/mkcands/ntuple");
    Double_t signalWeight     = 1.0;
    Double_t backgroundWeight = 1.0;
 
+   dataloader->AddSignalTree    ( treeS,     signalWeight );
+   dataloader->AddBackgroundTree( treeB, backgroundWeight );
 
-   factory->AddSignalTree    ( treeS,     signalWeight     );
-   factory->AddBackgroundTree( treeB, backgroundWeight );
+  // factory->AddSignalTree    ( treeS,     signalWeight     );
+  // factory->AddBackgroundTree( treeB, backgroundWeight );
    
 
    TCut mycuts = ""; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
    TCut mycutb = ""; // for example: TCut mycutb = "abs(var1)<0.5";
 
    //factory->PrepareTrainingAndTestTree( mycuts, mycutb, "SplitMode=Random:NormMode=NumEvents:!V" );
-   factory->PrepareTrainingAndTestTree( mycuts, mycutb, "SplitMode=Random:NormMode=NumEvents:nTrain_Signal=1000:!V" );
+   dataloader->PrepareTrainingAndTestTree( mycuts, mycutb, "SplitMode=Random:NormMode=NumEvents:nTrain_Signal=1000:!V" );
    //factory->PrepareTrainingAndTestTree( mycuts, mycutb, "SplitMode=Random:NormMode=NumEvents:nTrain_Signal=3000:nTrain_Background=60000:!V" );
 
- 
+   factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG",
+          "!H:!V:NTrees=1000:BoostType=Grad:Shrinkage=0.30:UseBaggedBoost:BaggedSampleFraction=0.6:SeparationType=GiniIndex:nCuts=20:MaxDepth=2" );  
+
+
    // Boosted Decision Trees (second one with decorrelation)
-     factory->BookMethod( TMVA::Types::kBDT, "BDT", 
+    // factory->BookMethod( TMVA::Types::kBDT, "BDT", 
 			  //"!H:!V:NTrees=100:BoostType=AdaBoost:SeparationType=MisClassificationError:nCuts=-1:PruneMethod=CostComplexity:PruneStrength=-1:NEventsMin=25" );
-			  "!H:!V:NTrees=200:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=-1:PruneMethod=CostComplexity:PruneStrength=-1:NEventsMin=25");
+	//		  "!H:!V:NTrees=3:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=-1:PruneMethod=CostComplexity:PruneStrength=-1:NEventsMin=25");
 			  //		   "!H:!V:NTrees=500:BoostType=AdaBoost:SeparationType=GiniIndexWithLaplace:nCuts=30:PruneMethod=CostComplexity:PruneStrength=-1:NEventsMin=20" );
      //			   "!H:!V:NTrees=500:BoostType=AdaBoost:SeparationType=GiniIndex:nCuts=50:PruneMethod=CostComplexity:PruneStrength=4.5:NEventsMin=15" );
 
