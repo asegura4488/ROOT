@@ -11,15 +11,10 @@
  using namespace std;
 
 void SetWork(){
-gROOT->ProcessLine(".L DataWork.C++");
+gROOT->ProcessLine(".L DataWork.C+");
 }
 
-void MakeRealPlot-test-BDT-v3(){
-
- SetWork();
-//------ Plotting
-
-
+void plot(){
 
 gStyle->SetCanvasColor(kWhite);     // background is no longer mouse-dropping white
 gStyle->SetPalette(1,0);            // blue to red false color palette. Use 9 for b/w
@@ -320,4 +315,5 @@ cout<<" Significance S/sqrt(S+B): "<<significance1<<endl;
 //cout<<" Probability :             "<<TMath::Prob(16.*chi2tmp,16)<<endl;
 cout<<" Number of events :        "<<NsVal<<" +/- "<<NsEVal<<endl;
 
-}//End analysis
+
+}
