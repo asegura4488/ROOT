@@ -17,27 +17,28 @@ void BDTAnalysisV0()
 
   TChain * ch = new TChain("ntuple","");
 
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1800.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_200.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_400.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_600.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_800.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab2_ks0.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab3_ks0.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab4_ks0.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1000.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1200.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1400.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1600.root/mkcands/ntuple");
-  
-  //ch->Add("/home/alejandro/Bd/datos_ks0/recofinalBs.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_1.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_2.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_3.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_4.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_5_200.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_5_400.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_5_600.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_5_800.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_5_1200.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_5_1400.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_5_1600.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_5_1800.root/mkcands/ntuple");
 
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Reco_B0.root/mkcands/ntuple"); 
+  
   TTree *tree = (TTree*)ch;
 
   DataBd tB(tree);
 
   TChain * chS = new TChain("ntuple","");
-chS->Add("/home/alejandro/Bd/outputMC_ks0_cern.root/mkcands/ntuple");
+
+  chS->Add("/home/alejandro/Documentos/B0_ks0_Data/Data/Ks0_Data.root/mkcands/ntuple");
 
 
   TTree *treeSignal = (TTree*)chS;
@@ -63,20 +64,20 @@ chS->Add("/home/alejandro/Bd/outputMC_ks0_cern.root/mkcands/ntuple");
   treeS->Branch("v1",&var[1],"v1/D");
   treeS->Branch("v2",&var[2],"v2/D");
   treeS->Branch("v3",&var[3],"v3/D");
-  //treeS->Branch("v4",&var[4],"v4/D");
+  treeS->Branch("v4",&var[4],"v4/D");
   treeS->Branch("v5",&var[5],"v5/D");
-  //treeS->Branch("v6",&var[6],"v6/D");
-  //treeS->Branch("v7",&var[7],"v7/D");
-  //treeS->Branch("v8",&var[8],"v8/D");
+  treeS->Branch("v6",&var[6],"v6/D");
+  treeS->Branch("v7",&var[7],"v7/D");
+  treeS->Branch("v8",&var[8],"v8/D");
   treeS->Branch("v9",&var[9],"v9/D");
   treeS->Branch("v10",&var[10],"v10/D");
   treeS->Branch("v11",&var[11],"v11/D");
-  //treeS->Branch("v12",&var[12],"v12/D");
+  treeS->Branch("v12",&var[12],"v12/D");
   treeS->Branch("v13",&var[13],"v13/D");
   treeS->Branch("v14",&var[14],"v14/D");
-  //treeS->Branch("v15",&var[15],"v15/D");
+  treeS->Branch("v15",&var[15],"v15/D");
   treeS->Branch("v16",&var[16],"v16/D");
-  //treeS->Branch("v17",&var[17],"v17/D");
+  treeS->Branch("v17",&var[17],"v17/D");
 
   //  treeS->Branch("v18",&var[18],"v18/D");
   //  treeS->Branch("v19",&var[19],"v19/D");
@@ -99,20 +100,20 @@ chS->Add("/home/alejandro/Bd/outputMC_ks0_cern.root/mkcands/ntuple");
   treeB->Branch("v1",&var[1],"v1/D");
   treeB->Branch("v2",&var[2],"v2/D");
   treeB->Branch("v3",&var[3],"v3/D");
-  //treeB->Branch("v4",&var[4],"v4/D");
+  treeB->Branch("v4",&var[4],"v4/D");
   treeB->Branch("v5",&var[5],"v5/D");
-  //treeB->Branch("v6",&var[6],"v6/D");
-  //treeB->Branch("v7",&var[7],"v7/D");
-  //treeB->Branch("v8",&var[8],"v8/D");
+  treeB->Branch("v6",&var[6],"v6/D");
+  treeB->Branch("v7",&var[7],"v7/D");
+  treeB->Branch("v8",&var[8],"v8/D");
   treeB->Branch("v9",&var[9],"v9/D");
   treeB->Branch("v10",&var[10],"v10/D");
   treeB->Branch("v11",&var[11],"v11/D");
-  //treeB->Branch("v12",&var[12],"v12/D");
+  treeB->Branch("v12",&var[12],"v12/D");
   treeB->Branch("v13",&var[13],"v13/D");
   treeB->Branch("v14",&var[14],"v14/D");
-  //treeB->Branch("v15",&var[15],"v15/D");
+  treeB->Branch("v15",&var[15],"v15/D");
   treeB->Branch("v16",&var[16],"v16/D");
-  //treeB->Branch("v17",&var[17],"v17/D");
+  treeB->Branch("v17",&var[17],"v17/D");
 
   //  treeB->Branch("v18",&var[18],"v18/D");
   //  treeB->Branch("v19",&var[19],"v19/D");
@@ -362,20 +363,20 @@ chS->Add("/home/alejandro/Bd/outputMC_ks0_cern.root/mkcands/ntuple");
    dataloader->AddVariable("v1", "#eta(K_{1}^{0})",  'F');
    dataloader->AddVariable("v2", "#phi(K_{1}^{0})", 'F');
    dataloader->AddVariable("v3", "P_{T}(K_{2}^{0})", 'F');
-   //factory->AddVariable("v4", "#eta(K_{0})", 'F');
+   dataloader->AddVariable("v4", "#eta(K_{0})", 'F');
    dataloader->AddVariable("v5", "#phi(K_{2}^{0})",  'F');
-   //factory->AddVariable("v6", "#eta(K_{0})", 'F');
-   //factory->AddVariable("v7", "#eta(K_{0})", 'F');
-   //factory->AddVariable("v8", "#eta(K_{0})", 'F');
+   dataloader->AddVariable("v6", "#eta(K_{0})", 'F');
+   dataloader->AddVariable("v7", "#eta(K_{0})", 'F');
+   dataloader->AddVariable("v8", "#eta(K_{0})", 'F');
    dataloader->AddVariable("v9", "#chi^{2}(K^{0}_{s})",  'F');
    dataloader->AddVariable("v10","#chi^{2}(J/ #phi)",  'F');
    dataloader->AddVariable("v11","#chi^{2}(B^{0})", 'F');
-   //factory->AddVariable("v12", "#eta(K_{0})", 'F');
+   dataloader->AddVariable("v12", "#eta(K_{0})", 'F');
    dataloader->AddVariable("v13", "#Delta(B.K^{0}_{2})", 'F');
    dataloader->AddVariable("v14", "#Delta(K^{0}_{1}.K^{0}_{2})", 'F');
-   //factory->AddVariable("v15", 'F');
+   dataloader->AddVariable("v15", 'F');
    dataloader->AddVariable("v16","#Delta(B.#mu)",  'F');
-   //  factory->AddVariable("v17", 'F');
+   dataloader->AddVariable("v17", 'F');
    //  factory->AddVariable("v18", 'F');
    //  factory->AddVariable("v19", 'F');
    //  factory->AddVariable("v20", 'F');

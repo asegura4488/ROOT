@@ -10,10 +10,9 @@
 
 #include <TROOT.h>
 #include <TChain.h>
+#include <TTree.h>
 #include <TFile.h>
 
-
-#include <vector>
 // Header file for the classes stored in the TTree if any.
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
@@ -52,7 +51,7 @@ public :
 
 #endif
 
-#ifdef DataWork_cxx
+//#ifdef DataWork_cxx
 DataWork::DataWork(TTree *tree) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
@@ -143,4 +142,4 @@ Int_t DataWork::Cut(Long64_t entry)
 // returns -1 otherwise.
    return 1;
 }
-#endif // #ifdef DataWork_cxx
+//#endif // #ifdef DataWork_cxx

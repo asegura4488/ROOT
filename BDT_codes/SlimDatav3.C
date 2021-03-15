@@ -14,20 +14,21 @@ void SlimDatav3()
 
   TChain * ch = new TChain("ntuple","");
 
- // ch->Add("/home/alejandro/Bd/datos_ks0/recofinalBs.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab2_ks0.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab3_ks0.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab4_ks0.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1000.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1200.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1400.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1600.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1800.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_200.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_400.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_600.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_800.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_1.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_2.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_3.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_4.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_5_200.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_5_400.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_5_600.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_5_800.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_5_1200.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_5_1400.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_5_1600.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_5_1800.root/mkcands/ntuple");
 
+
+ 
   TTree *tree = (TTree*)ch;
 
   DataBd t(tree);
@@ -68,8 +69,8 @@ void SlimDatav3()
 
 
   TMVA::Reader *reader = new TMVA::Reader("!Color");    
-  string dir = "/home/alejandro/Bd/TMVA/weights/";
-  string prefix = "BDTAnalysisv4-test";
+  string dir = "/home/alejandro/Documentos/Codes/dJ/weights/";
+  string prefix = "BDTAnalysisv4-test_BDTG.weights.xml";
 
   Float_t var[35];
 
@@ -77,20 +78,20 @@ void SlimDatav3()
    reader->AddVariable("v1", &var[1]);
    reader->AddVariable("v2", &var[2]);
    reader->AddVariable("v3", &var[3]);
-   //reader->AddVariable("v4", &var[4]);
+   reader->AddVariable("v4", &var[4]);
    reader->AddVariable("v5", &var[5]);
-   //reader->AddVariable("v6", &var[6]);
-  //reader->AddVariable("v7", &var[7]);
-   //reader->AddVariable("v8", &var[8]);
+   reader->AddVariable("v6", &var[6]);
+   reader->AddVariable("v7", &var[7]);
+   reader->AddVariable("v8", &var[8]);
    reader->AddVariable("v9", &var[9]);
    reader->AddVariable("v10", &var[10]);
    reader->AddVariable("v11", &var[11]);
-   //reader->AddVariable("v12", &var[12]);
+   reader->AddVariable("v12", &var[12]);
    reader->AddVariable("v13", &var[13]);
    reader->AddVariable("v14", &var[14]);
-   //reader->AddVariable("v15", &var[15]);
+   reader->AddVariable("v15", &var[15]);
    reader->AddVariable("v16", &var[16]);
-   //   reader->AddVariable("v17", &var[17]);
+   reader->AddVariable("v17", &var[17]);
    //   reader->AddVariable("v18", &var[18]);
    //   reader->AddVariable("v19", &var[19]);
    //   reader->AddVariable("v20", &var[20]);
@@ -101,7 +102,7 @@ void SlimDatav3()
 //    reader->AddVariable("v25", &var[25]);
 
 
-   reader->BookMVA( "BDT method", dir + prefix + "_BDT.weights.xml" );
+   reader->BookMVA( "BDT method", dir + prefix  );
 
    cout<<"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"<<endl;
    cout<<" Reading data ..."<<nentries<<endl;
@@ -210,7 +211,7 @@ void SlimDatav3()
 
 	      bdt = reader->EvaluateMVA( "BDT method"); 
 
-	      //if(bdt<-0.5) continue;
+	     // if(bdt<-0.5) continue;
        
 	      mass = t.B_mass->at(i);
 	      massJ = t.B_J_mass->at(i);
