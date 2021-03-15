@@ -78,6 +78,9 @@ gStyle->SetMarkerSize(1.4);
 
       M=t.mB;
 
+	//M.Print();
+
+
       data.add(RooArgSet(M)); 
 
     }
@@ -145,10 +148,10 @@ RooRealVar fb("fb","fb",0.,1.);
  //RooAddPdf MassModel("MassModel","MassModel",RooArgList(Sig,expB),RooArgList(Ns,Nb));
  //RooAddPdf MassModel("MassModel","MassModel",RooArgList(Sig,bkg),RooArgList(Ns,Nb));
  //RooAddPdf MassModel("MassModel","MassModel",RooArgList(Signal,bkg1),RooArgList(Ns,Nb));
-RooAddPdf MassModel("MassModel","MassModel",RooArgList(Sig,SigB2,bkg1),RooArgList(Ns,Nbs,Nb));
+ RooAddPdf MassModel("MassModel","MassModel",RooArgList(Sig,SigB2,bkg1),RooArgList(Ns,Nbs,Nb));
 
  //RooAddPdf sigb("sigb","sigb",RooArgList(SigB2,Sig),fs);
- //RooAddPdf MassModel("MassModel","MassModel",RooArgList(bkg1,sigb),fb,kTRUE);                 // Este es el bueno
+// RooAddPdf MassModel("MassModel","MassModel",RooArgList(bkg1,sigb),fb,kTRUE);                 // Este es el bueno
 
 
 //-------------- End Mass model definition ---------------------------
@@ -159,7 +162,7 @@ RooAddPdf MassModel("MassModel","MassModel",RooArgList(Sig,SigB2,bkg1),RooArgLis
 //Setting Mass model parameter
  fs.setVal(0.8);
  fs2.setVal(0.95);
- Ns.setVal(10000);
+ Ns.setVal(1000);
  Nbs.setVal(30);
  Nb.setVal(100);
  mean.setVal(5.3);
@@ -177,9 +180,12 @@ RooAddPdf MassModel("MassModel","MassModel",RooArgList(Sig,SigB2,bkg1),RooArgLis
  
  RooFitResult* fitres = MassModel.fitTo(data,Extended(),Minos(kFALSE),Save(kTRUE));
  
-meanB2.setConstant(kFALSE);
+ meanB2.setConstant(kFALSE);
  
  fitres = MassModel.fitTo(data,Extended(),Minos(kFALSE),Save(kTRUE));
+
+
+ 
 
 //Calculating S/srt(B)
 Double_t mVal = mean.getVal();
@@ -266,7 +272,7 @@ cout<<" --> "<<nevt<<endl;
  NsVal = Ns.getVal();
  NsEVal = Ns.getError();
 
-fitres->Print("v");
+//fitres->Print("v");
 
 cout<<" Results : "<<endl;
 Nb.Print();
@@ -276,6 +282,9 @@ dataSignal->Print();
 
 
   Double_t minNLLAll = fitres->minNll();
+
+  cout << minNLLAll << endl;
+
   mean.setConstant(kTRUE);
   width.setConstant(kTRUE);
   Nbs.setVal(0.0);
@@ -284,15 +293,31 @@ dataSignal->Print();
   widthB2.setConstant(kTRUE);
   a0.setConstant(kTRUE);
   a1.setConstant(kTRUE);
-  Ns.setConstant(kTRUE);
-  Nb.setConstant(kTRUE);
-  RooFitResult* fitres1 = MassModel.fitTo(data,Extended(),Minos(kFALSE),Save(kTRUE));
-  Double_t minNLLBkg = fitres1->minNll();
-
-
-fitres->Print("v");
  
-fitres1->Print("v");
+  Nb.setConstant(kTRUE);
+
+//   Ns.setConstant(kTRUE);
+
+  RooFitResult *fitter2 = MassModel.fitTo(data,Extended(),Minos(kFALSE),Save(kTRUE));
+
+ Double_t minNLLBkg = fitter2->minNll(); 
+
+ cout << minNLLBkg << endl;
+
+
+
+
+//  Ns.setConstant(kTRUE);
+//  Nb.setConstant(kTRUE);
+
+  
+
+
+ 
+
+//fitres->Print("v");
+ 
+//fitres1->Print("v");
 
   Double_t L1 = TMath::Exp(minNLLBkg);
   Double_t L2 = TMath::Exp(minNLLAll);
@@ -302,7 +327,7 @@ fitres1->Print("v");
   cout<<" 1/LR : "<<1/TMath::Exp(minNLLBkg - minNLLAll)<<endl;
   
   Double_t sigLL = sqrt(2.*(minNLLBkg - minNLLAll));
-  cout<<" sfsdfsdfsddsd Significance from LR : "<<sigLL<<endl;
+  cout<<"Significance from LR : "<<sigLL<<endl;
 
 
 Double_t significance = NsVal/sqrt(1.*nevt - NsVal);
