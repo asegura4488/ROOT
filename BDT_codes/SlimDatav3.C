@@ -14,19 +14,19 @@ void SlimDatav3()
 
   TChain * ch = new TChain("ntuple","");
 
- // ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/recofinalBs.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab2_ks0.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab3_ks0.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab4_ks0.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab5_ks0_1000.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab5_ks0_1200.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab5_ks0_1400.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab5_ks0_1600.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab5_ks0_1800.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab5_ks0_200.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab5_ks0_400.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab5_ks0_600.root/mkcands/ntuple");
-  ch->Add("/home/alejandro/Documentos/Bd/datos_ks0/crab5_ks0_800.root/mkcands/ntuple");
+ // ch->Add("/home/alejandro/Bd/datos_ks0/recofinalBs.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab2_ks0.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab3_ks0.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab4_ks0.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1000.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1200.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1400.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1600.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_1800.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_200.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_400.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_600.root/mkcands/ntuple");
+  ch->Add("/home/alejandro/Bd/datos_ks0/crab5_ks0_800.root/mkcands/ntuple");
 
   TTree *tree = (TTree*)ch;
 
@@ -68,7 +68,7 @@ void SlimDatav3()
 
 
   TMVA::Reader *reader = new TMVA::Reader("!Color");    
-  string dir = "/home/alejandro/Documentos/Bd/TMVA/weights/";
+  string dir = "/home/alejandro/Bd/TMVA/weights/";
   string prefix = "BDTAnalysisv4-test";
 
   Float_t var[35];
