@@ -38,7 +38,9 @@ void BDTAnalysisV0()
 
   TChain * chS = new TChain("ntuple","");
 
+  chS->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Reco_B0.root/mkcands/ntuple"); 
   chS->Add("/home/alejandro/Documentos/B0_ks0_Data/Data/Ks0_Data.root/mkcands/ntuple");
+  chS->Add("/home/alejandro/Documentos/B0_ks0_Data/MC/Ks0_5_1800.root/mkcands/ntuple");
 
 
   TTree *treeSignal = (TTree*)chS;
@@ -265,6 +267,10 @@ void BDTAnalysisV0()
 
 	  if( (tB.B_mass->at(i)<5.05 || tB.B_mass->at(i)>5.25) && (tB.B_mass->at(i)<5.4 || tB.B_mass->at(i)>5.56) ) continue;
 
+	  //if( (tB.B_mass->at(i) < 5.2 || tB.B_mass->at(i) > 5.4) ) continue;
+
+	 // std::cout << tB.B_mass->at(i) << endl;
+
 	  if(tB.B_J_mass->at(i)<3.0 || tB.B_J_mass->at(i)>3.2) continue;
 	  if(tB.B_Ks0_mass->at(i)<0.46 || tB.B_Ks0_mass->at(i)>0.55) continue;
 	  if(tB.B_Ks0_charge1->at(i)==tB.B_Ks0_charge2->at(i)) continue;
@@ -403,11 +409,14 @@ void BDTAnalysisV0()
    TCut mycutb = ""; // for example: TCut mycutb = "abs(var1)<0.5";
 
    //factory->PrepareTrainingAndTestTree( mycuts, mycutb, "SplitMode=Random:NormMode=NumEvents:!V" );
-   dataloader->PrepareTrainingAndTestTree( mycuts, mycutb, "SplitMode=Random:NormMode=NumEvents:nTrain_Signal=1000:!V" );
+   dataloader->PrepareTrainingAndTestTree( mycuts, mycutb, "SplitMode=Random:NormMode=NumEvents:nTrain_Signal=3000:!V" );
    //factory->PrepareTrainingAndTestTree( mycuts, mycutb, "SplitMode=Random:NormMode=NumEvents:nTrain_Signal=3000:nTrain_Background=60000:!V" );
 
+ //  factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG",
+  //        "!H:!V:NTrees=100:BoostType=Grad:Shrinkage=0.30:UseBaggedBoost:BaggedSampleFraction=0.6:SeparationType=GiniIndex:nCuts=20:MaxDepth=2" );  
+
    factory->BookMethod( dataloader, TMVA::Types::kBDT, "BDTG",
-          "!H:!V:NTrees=1000:BoostType=Grad:Shrinkage=0.30:UseBaggedBoost:BaggedSampleFraction=0.6:SeparationType=GiniIndex:nCuts=20:MaxDepth=2" );  
+          "!H:V:NTrees=100:BoostType=AdaBoost:Shrinkage=0.30:SeparationType=GiniIndexWithLaplace:UseBaggedBoost:PruneStrength=4.5:BaggedSampleFraction=0.6:SeparationType=GiniIndex:nCuts=50" );  
 
 
    // Boosted Decision Trees (second one with decorrelation)
@@ -436,5 +445,6 @@ void BDTAnalysisV0()
    delete factory;
 
    // Launch the GUI for the root macros
-   if (!gROOT->IsBatch()) TMVAGui( outfileName );
+   if (!gROOT->IsBatch()) TMVA::TMVAGui( outfileName );
+   
 }
